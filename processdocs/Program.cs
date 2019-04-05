@@ -28,16 +28,26 @@ namespace processdocs
         // *******************
         // Sub routines
         // *******************
+        private static bool fileopen = true;
+        private static int errorcount = 0;
+        private static bool debug = false;
 
         static private string GetTextFromPDF(string fname)
         {
             StringBuilder text = new StringBuilder();
-            using (PdfReader reader = new PdfReader(fname))
-            {
-                for (int i = 1; i <= reader.NumberOfPages; i++)
+            try {
+                using (PdfReader reader = new PdfReader(fname))
                 {
-                    text.Append(PdfTextExtractor.GetTextFromPage(reader, i));
+                    for (int i = 1; i <= reader.NumberOfPages; i++)
+                    {
+                        text.Append(PdfTextExtractor.GetTextFromPage(reader, i));
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error on pdf open {0}", e);
+                fileopen = false;
             }
 
             return text.ToString();
@@ -47,6 +57,7 @@ namespace processdocs
         // Reading Text from Word docx, pdf or rtf file
         static private string GetTextFromDocs(string fname)
         {
+            fileopen = true;    // Reset fileopen error flag
             if (fname.Contains(".pdf"))
             {
                 return GetTextFromPDF(fname);
@@ -65,9 +76,19 @@ namespace processdocs
                     }
                     return text.ToString();
                 }
-                catch
+                catch (Exception e)
                 {
-                    Console.WriteLine("File Error ==>{0}", fname);
+                    if (debug == true)
+                    {
+                        Console.WriteLine("File Error ==>{0}", e);
+                        Console.WriteLine("Error on file {0}", fname);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error on file {0}", fname);
+                        errorcount = errorcount + 1;                    }
+
+                    fileopen = false;
                     return null;
                 }
             }
@@ -122,17 +143,21 @@ namespace processdocs
 
         static private string processdocument(string inputfile)
         {
-            string currentdoc = GetTextFromDocs(inputfile); 
-            currentdoc = lowercase(currentdoc);
-            currentdoc = RemoveURL(currentdoc);
-            currentdoc = removeNumbers(currentdoc);
-            currentdoc = StripEmails(currentdoc);
-            currentdoc = Strippunctuation(currentdoc);
+            string currentdoc = GetTextFromDocs(inputfile);
+            if (fileopen == true)
+            {
+                currentdoc = lowercase(currentdoc);
+                currentdoc = RemoveURL(currentdoc);
+                currentdoc = removeNumbers(currentdoc);
+                currentdoc = StripEmails(currentdoc);
+                currentdoc = Strippunctuation(currentdoc);
+            }
             return currentdoc;
         }
 
         static void Main(string[] args)
         {
+            debug = false; // If set increases output of info
             string output;
             string[] tokens;
             StreamWriter outfile = new StreamWriter("dictionary.txt");
@@ -147,12 +172,16 @@ namespace processdocs
             string[] rtf = Directory.GetFiles(path, "*.rtf");
             string[] docArray = docx.Concat(Directory.GetFiles(path, "*.pdf")).ToArray();
             docArray = docArray.Concat(rtf).ToArray();
-                        
+            Array.Sort(docArray);   // Ensure sort order is maintained across the processing apps
+
             // list all docs found
-            Console.WriteLine("We found the following list of files: ");
-            foreach (var file in docArray)
+            if (debug == true)
             {
-                // Console.WriteLine(file);
+                Console.WriteLine("We found the following list of files: ");
+                foreach (var file in docArray)
+                {
+                    Console.WriteLine(file);
+                }
             }
             Console.WriteLine("Total Files found:{0}", docArray.Length);
 
@@ -161,6 +190,8 @@ namespace processdocs
             foreach (var file in docArray)
             {
                 output = processdocument(file);
+                if (fileopen == false)
+                    continue;
                 string fname = file;
                 
                 fname = file.Replace(".docx", ".txt").Replace(".pdf", ".txt").Replace(".rtf", ".txt");
@@ -200,12 +231,15 @@ namespace processdocs
             }
 
             // Now write out the dicionary to a text file
-            foreach (var entry in dictionary)
+            if (fileopen == true )
             {
-                outfile.WriteLine("{0}, {1}", entry.Key, entry.Value);
+                foreach (var entry in dictionary)
+                {
+                    outfile.WriteLine("{0}, {1}", entry.Key, entry.Value);
+                }
+                outfile.Close(); // added this becuase for resumes of less than a page the dict was empty
             }
-            outfile.Close(); // added this becuase for resumes of less than a page the dict was empty
-
+            Console.WriteLine("{0} Errors found", errorcount);
         }
     }
 }
