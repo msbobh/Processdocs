@@ -108,7 +108,11 @@ namespace processdocs
         //
         static private string removeNumbers(string currentdoc)
         {
+            // First action strips out the single digits and replaces with an empty string
+            // final line removes the remaining number formats including exponents
+            currentdoc = System.Text.RegularExpressions.Regex.Replace(currentdoc, @"[\d]", string.Empty);
             return System.Text.RegularExpressions.Regex.Replace(currentdoc, @"\$?[0-9]+[\.[0-9]+", "number");
+                        
         }
 
         //
@@ -202,7 +206,7 @@ namespace processdocs
                 //*************
                 // tokenization
                 //*************
-                char[] separators = { ' ', ',', '.', '-', ':', ';', '{', '}', '|', '\n', '\t', '\u2029', '\r' };
+                char[] separators = { '_',' ', ',', '.', '-', ':', ';', '{', '}', '|', '\n', '\t', '\u2029', '\r' };
                 tokens = output.Split(separators, StringSplitOptions.RemoveEmptyEntries);
                 var stemmer = new PorterStemmer();
 
@@ -237,7 +241,7 @@ namespace processdocs
                 {
                     outfile.WriteLine("{0}, {1}", entry.Key, entry.Value);
                 }
-                outfile.Close(); // added this becuase for resumes of less than a page the dict was empty
+                outfile.Close(); // added this because for resumes of less than a page the dict was empty
             }
             Console.WriteLine("{0} Errors found", errorcount);
         }
