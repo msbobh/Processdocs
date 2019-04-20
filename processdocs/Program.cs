@@ -118,7 +118,6 @@ namespace processdocs
         //
         // Strip out punctuation
         //
-
         static private string Strippunctuation(string currentdoc)
         {
 
@@ -162,6 +161,23 @@ namespace processdocs
         static void Main(string[] args)
         {
             debug = false; // If set increases output of info
+            string usage = "Usage options: \"verbose\" for additional output ";
+            
+            if (args.Length != 0)
+            {
+                switch (args[0])
+                {
+                    case "verbose":
+                        debug = true;
+                        break;
+
+                    default:
+                        Console.WriteLine(usage);
+                        break;
+                }
+            }
+                  
+            
             string output;
             string[] tokens;
             StreamWriter outfile = new StreamWriter("dictionary.txt");

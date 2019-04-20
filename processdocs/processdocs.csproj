@@ -35,8 +35,9 @@
     <Reference Include="itextsharp, Version=5.5.13.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
       <HintPath>..\packages\iTextSharp.5.5.13\lib\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="SautinSoft.Document, Version=3.6.12.4, Culture=neutral, PublicKeyToken=e759c76c7515592a, processorArchitecture=MSIL">
-      <HintPath>..\packages\sautinsoft.document.3.6.12.4\lib\net461\SautinSoft.Document.dll</HintPath>
+    <Reference Include="SautinSoft.Document, Version=3.7.4.3, Culture=neutral, PublicKeyToken=e759c76c7515592a, processorArchitecture=MSIL">
+      <HintPath>..\packages\sautinsoft.document.3.7.4.3\lib\net461\SautinSoft.Document.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
