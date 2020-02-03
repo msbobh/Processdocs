@@ -7,7 +7,7 @@ Processdocs – reads in pdf, docx and rtf files and performs the following:
 
 •	Destems all words (using an implementation of the porter stemmer)
 
-•	Writes out the processed files with same file name but with a .txt suffice
+•	Writes out the processed files with same file name but with a .txt suffix
 
 •	Creates a dictionary (dictionary.txt) of all unique words (column 1) and word frequency (column 2).
 
